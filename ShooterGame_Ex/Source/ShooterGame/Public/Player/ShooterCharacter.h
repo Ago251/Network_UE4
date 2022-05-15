@@ -193,6 +193,12 @@ class AShooterCharacter : public ACharacter
 	/** player released jump action */
 	void OnStopJump();
 
+	/** player pressed jetpack action */
+	void OnStartJetpack();
+
+	/** player released jetpack action */
+	void OnStopJetpack();
+
 	/** player pressed run action */
 	void OnStartRunning();
 

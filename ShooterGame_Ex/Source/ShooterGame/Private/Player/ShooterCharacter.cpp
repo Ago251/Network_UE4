@@ -883,6 +883,9 @@ void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AShooterCharacter::OnStartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AShooterCharacter::OnStopJump);
 
+	PlayerInputComponent->BindAction("Jetpack", IE_Pressed, this, &AShooterCharacter::OnStartJetpack);
+	PlayerInputComponent->BindAction("Jetpack", IE_Released, this, &AShooterCharacter::OnStopJetpack);
+
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AShooterCharacter::OnStartRunning);
 	PlayerInputComponent->BindAction("RunToggle", IE_Pressed, this, &AShooterCharacter::OnStartRunningToggle);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AShooterCharacter::OnStopRunning);
@@ -1166,6 +1169,19 @@ void AShooterCharacter::OnStopJump()
 	bPressedJump = false;
 	StopJumping();
 }
+
+void AShooterCharacter::OnStartJetpack()
+{
+	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed() && Jetpack1P->CanUse())
+		Jetpack1P->SetJetpack(true);
+}
+
+void AShooterCharacter::OnStopJetpack()
+{
+	Jetpack1P->SetJetpack(false);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Replication
