@@ -42,6 +42,7 @@ public:
 	bool bUseJetpack;
 
 private:
+
 	float Fuel;
 	float ElapsedTime;
 	AShooterCharacter* ShooterCharacterOwner;
@@ -53,6 +54,7 @@ protected:
 
 public:	
 
+	const float& GetFuel() const { return Fuel; }
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

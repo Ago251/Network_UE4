@@ -240,10 +240,13 @@ protected:
 
 	UPROPERTY()
 	UTexture2D* JetpackTexture;
+
 	UPROPERTY()
 	FCanvasIcon JetpackBarBg;
+
 	UPROPERTY()
 	FCanvasIcon JetpackBar;
+
 	UPROPERTY()
 	FCanvasIcon JetpackIcon;
 
