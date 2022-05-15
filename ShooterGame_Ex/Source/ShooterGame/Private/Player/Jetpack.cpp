@@ -10,6 +10,13 @@ UJetpack::UJetpack()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	MaxFuel = 100;
+	Fuel = 50;
+	FuelRecover = 0.1;
+	FuelConsume = 10;
+	TimeFuelConsume = 1;
+	TimeRecover = 10;
+	MaxSpeed = 1000;
 	// ...
 }
 
