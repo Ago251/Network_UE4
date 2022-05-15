@@ -18,6 +18,13 @@ public:
 	// Sets default values for this component's properties
 	UJetpack();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability|Jetpack")
+	UCurveFloat* JetpackCurve;
+private:
+	float Fuel;
+	float ElapsedTime;
+	AShooterCharacter* ShooterCharacterOwner;
+	UCharacterMovementComponent* CharacterMovement;
 
 protected:
 	// Called when the game starts
@@ -28,4 +35,6 @@ public:
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void PhysJetpack(float deltaTime, int32 Iterations);
 };

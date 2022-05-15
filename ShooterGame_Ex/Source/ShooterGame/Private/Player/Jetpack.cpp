@@ -18,6 +18,9 @@ UJetpack::UJetpack()
 void UJetpack::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ShooterCharacterOwner = Cast<AShooterCharacter>(GetOwner());
+	CharacterMovement = ShooterCharacterOwner->GetCharacterMovement();
 	// ...
 	
 }
@@ -30,4 +33,18 @@ void UJetpack::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// ...
 }
 
+void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
+	float JetDir = CharacterMovement->GetGravityZ() * -1;
+
+	if (Fuel <= 0.0f) {
+		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
+
+	ElapsedTime += deltaTime * JetDir;
+	float CurveValue = JetpackCurve->GetFloatValue(ElapsedTime);
+
+	CharacterMovement->Velocity.Z = CurveValue * MaxSpeed * deltaTime;
+
+	CharacterMovement->PhysFalling(deltaTime, Iterations);
+}
 
