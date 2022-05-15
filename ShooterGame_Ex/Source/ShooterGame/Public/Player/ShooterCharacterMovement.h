@@ -7,11 +7,21 @@
 #pragma once
 #include "ShooterCharacterMovement.generated.h"
 
+UENUM(BlueprintType)
+enum ECustomMovementMode
+{
+	CUSTOM_Jetpack = 0
+};
+
 UCLASS()
 class UShooterCharacterMovement : public UCharacterMovementComponent
 {
 	GENERATED_UCLASS_BODY()
 
 	virtual float GetMaxSpeed() const override;
+
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+};
+
 };
 

@@ -31,3 +31,17 @@ float UShooterCharacterMovement::GetMaxSpeed() const
 
 	return MaxSpeed;
 }
+
+void UShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations) {
+	const AShooterCharacter* ShooterCharacterOwner = Cast<AShooterCharacter>(PawnOwner);
+	switch (CustomMovementMode) {
+		case CUSTOM_Jetpack:
+			ShooterCharacterOwner->Jetpack1P->PhysJetpack(deltaTime, Iterations);
+			break;
+
+		default:
+			break;
+	}
+}
+
+}
