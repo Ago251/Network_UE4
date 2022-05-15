@@ -25,6 +25,9 @@ public:
 	float MaxFuel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float FuelRecover;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
 	float FuelConsume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
@@ -32,6 +35,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
 	float TimeFuelConsume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float TimeRecover;
+
+	bool bUseJetpack;
+
 private:
 	float Fuel;
 	float ElapsedTime;
@@ -48,5 +57,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+
+	void RecoverJetpackFuel(float DeltaTime);
 	void PhysJetpack(float deltaTime, int32 Iterations);
 };

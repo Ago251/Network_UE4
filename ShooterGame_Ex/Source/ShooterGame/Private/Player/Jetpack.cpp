@@ -30,7 +30,16 @@ void UJetpack::BeginPlay()
 void UJetpack::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	RecoverJetpackFuel(DeltaTime);
 	// ...
+}
+
+void UJetpack::RecoverJetpackFuel(float DeltaTime) {
+	if (!bUseJetpack) {
+		float FuelRecovered = FuelRecover * (DeltaTime * TimeRecover);
+		Fuel = FMath::Clamp(Fuel + FuelRecover, 0.0f, MaxFuel);
+	}
 }
 
 void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
@@ -40,6 +49,7 @@ void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	Fuel = FMath::Clamp(Fuel - FuelConsumed, 0.0f, MaxFuel);
 
 	if (Fuel <= 0.0f) {
+		bUseJetpack = false;
 		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Falling);
 	}
 
