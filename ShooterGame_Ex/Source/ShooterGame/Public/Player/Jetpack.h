@@ -57,7 +57,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	bool CanUse();
 
 	void RecoverJetpackFuel(float DeltaTime);
+
+	void SetJetpack(bool useRequest);
+
 	void PhysJetpack(float deltaTime, int32 Iterations);
+
+	void ExecJetpack(bool useRequest);
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	void ServerJetpack(bool useRequest);
 };

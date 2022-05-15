@@ -35,6 +35,10 @@ void UJetpack::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// ...
 }
 
+bool UJetpack::CanUse() { 
+	return Fuel > 0;
+}
+
 void UJetpack::RecoverJetpackFuel(float DeltaTime) {
 	if (!bUseJetpack) {
 		float FuelRecovered = FuelRecover * (DeltaTime * TimeRecover);
@@ -59,5 +63,37 @@ void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	CharacterMovement->Velocity.Z = CurveValue * MaxSpeed * deltaTime;
 
 	CharacterMovement->PhysFalling(deltaTime, Iterations);
+}
+
+void UJetpack::SetJetpack(bool useRequest) {
+	if (!GetOwner()->HasAuthority() && ShooterCharacterOwner->IsLocallyControlled())
+		ServerJetpack(useRequest);
+	else
+		ExecJetpack(useRequest);
+}
+
+void UJetpack::ExecJetpack(bool useRequest) {
+	if (CanUse()) {
+		if (useRequest) {
+			bUseJetpack = true;
+			CharacterMovement->SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CUSTOM_Jetpack);
+		}
+	}
+
+	if (!useRequest) {
+		bUseJetpack = false;
+		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
+}
+
+bool UJetpack::ServerJetpack_Validate(bool useRequest) {
+	return true;
+}
+
+void UJetpack::ServerJetpack_Implementation(bool useRequest) {
+	if (CanUse())
+		ExecJetpack(useRequest);
+	else if (!useRequest)
+		ExecJetpack(useRequest);
 }
 
