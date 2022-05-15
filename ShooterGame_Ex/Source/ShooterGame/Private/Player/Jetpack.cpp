@@ -36,6 +36,9 @@ void UJetpack::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	float JetDir = CharacterMovement->GetGravityZ() * -1;
 
+	float FuelConsumed = FuelConsume * (deltaTime / TimeFuelConsume);
+	Fuel = FMath::Clamp(Fuel - FuelConsumed, 0.0f, MaxFuel);
+
 	if (Fuel <= 0.0f) {
 		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Falling);
 	}

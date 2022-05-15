@@ -20,6 +20,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability|Jetpack")
 	UCurveFloat* JetpackCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float MaxFuel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float FuelConsume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Speed")
+	float MaxSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float TimeFuelConsume;
 private:
 	float Fuel;
 	float ElapsedTime;
