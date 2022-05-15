@@ -37,6 +37,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDMainTextureOb(TEXT("/Game/UI/HUD/HUDMain"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDAssets02TextureOb(TEXT("/Game/UI/HUD/HUDAssets02"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LowHealthOverlayTextureOb(TEXT("/Game/UI/HUD/LowHealthOverlay"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> JetpackTextureOb(TEXT("/Game/UI/HUD/jetpack_icon"));
 
 	// Fonts are not included in dedicated server builds.
 	#if !UE_SERVER
@@ -52,6 +53,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	HUDMainTexture = HUDMainTextureOb.Object;
 	HUDAssets02Texture = HUDAssets02TextureOb.Object;
 	LowHealthOverlayTexture = LowHealthOverlayTextureOb.Object;
+	JetpackTexture = JetpackTextureOb.Object;
 
 	HitNotifyIcon[EShooterHudPosition::Left] = UCanvas::MakeIcon(HitNotifyTexture,  158, 831, 585, 392);	
 	HitNotifyIcon[EShooterHudPosition::FrontLeft] = UCanvas::MakeIcon(HitNotifyTexture, 369, 434, 460, 378);	
@@ -76,6 +78,10 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	TimerIcon = UCanvas::MakeIcon(HUDMainTexture, 381, 93, 24, 24);
 	KilledIcon = UCanvas::MakeIcon(HUDMainTexture, 425, 92, 38, 36);
 	PlaceIcon = UCanvas::MakeIcon(HUDMainTexture, 250, 468, 21, 28);
+
+	JetpackBar = UCanvas::MakeIcon(HUDAssets02Texture, 67, 212, 372, 50);
+	JetpackBarBg = UCanvas::MakeIcon(HUDAssets02Texture, 67, 162, 372, 50);
+	JetpackIcon = UCanvas::MakeIcon(JetpackTexture, 0, 0, 0, 0);
 
 	Crosshair[EShooterCrosshairDirection::Left] = UCanvas::MakeIcon(HUDMainTexture, 43, 402, 25, 9); // left
 	Crosshair[EShooterCrosshairDirection::Right] = UCanvas::MakeIcon(HUDMainTexture, 88, 402, 25, 9); // right
@@ -645,6 +651,7 @@ void AShooterHUD::DrawHUD()
 		{
 			DrawHealth();
 			DrawWeaponHUD();
+			DrawJetpackFuel();
 		}
 		else
 		{
@@ -1281,5 +1288,24 @@ float AShooterHUD::DrawRecentlyKilledPlayer()
 	}
 	return LastYPos;
 }
+
+void AShooterHUD::DrawJetpackFuel() {
+	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
+	Canvas->SetDrawColor(FColor::White);
+
+	const float JetpackPosX = (Canvas->ClipX - JetpackBarBg.UL * ScaleUI) / 2;
+	const float JetpackPosY = Canvas->ClipY - (Offset * 5 + JetpackBarBg.VL) * ScaleUI;
+	Canvas->DrawIcon(JetpackBarBg, JetpackPosX, JetpackPosY, ScaleUI);
+	const float JetpackAmount = FMath::Min(1.0f, MyPawn->Jetpack1P->GetFuel() / MyPawn->Jetpack1P->MaxFuel);
+
+	FCanvasTileItem TileItem(FVector2D(JetpackPosX, JetpackPosY), JetpackBar.Texture->Resource,
+		FVector2D(JetpackBar.UL * JetpackAmount * ScaleUI, JetpackBar.VL * ScaleUI), FLinearColor::White);
+	MakeUV(JetpackBar, TileItem.UV0, TileItem.UV1, JetpackBar.U, JetpackBar.V, JetpackBar.UL * JetpackAmount, JetpackBar.VL);
+	TileItem.BlendMode = SE_BLEND_Translucent;
+	Canvas->DrawItem(TileItem);
+
+	Canvas->DrawIcon(JetpackIcon, JetpackPosX + Offset * ScaleUI, JetpackPosY + (JetpackBar.VL - JetpackIcon.VL) / 2.0f * ScaleUI, ScaleUI);
+}
+
 
 #undef LOCTEXT_NAMESPACE

@@ -238,6 +238,15 @@ protected:
 	UPROPERTY()
 	FCanvasIcon PlaceIcon;
 
+	UPROPERTY()
+	UTexture2D* JetpackTexture;
+	UPROPERTY()
+	FCanvasIcon JetpackBarBg;
+	UPROPERTY()
+	FCanvasIcon JetpackBar;
+	UPROPERTY()
+	FCanvasIcon JetpackIcon;
+
 	/** UI scaling factor for other resolutions than Full HD. */
 	float ScaleUI;
 
@@ -349,6 +358,9 @@ protected:
 
 	/** Draw Performance timer */
 	void DrawPerfTimer(const FString& Label, const FString& Value, float PosX, float PosY);
+
+	/** Draw player's jetpack fuel bar. */
+	void DrawJetpackFuel();
 
 	/** Delegate for telling other methods when players have started/stopped talking */
 	FOnPlayerTalkingStateChangedDelegate OnPlayerTalkingStateChangedDelegate;
