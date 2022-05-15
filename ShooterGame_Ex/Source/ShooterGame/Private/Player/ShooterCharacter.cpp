@@ -8,6 +8,7 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
 #include "Sound/SoundNodeLocalPlayer.h"
+#include "Player/Jetpack.h"
 #include "AudioThread.h"
 
 static int32 NetVisualizeRelevancyTestPoints = 0;
@@ -33,6 +34,7 @@ FOnShooterCharacterUnEquipWeapon AShooterCharacter::NotifyUnEquipWeapon;
 AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UShooterCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
+	Jetpack1P = ObjectInitializer.CreateDefaultSubobject<UJetpack>(this, TEXT("PawnJetpack1P"));
 	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh1P"));
 	Mesh1P->SetupAttachment(GetCapsuleComponent());
 	Mesh1P->bOnlyOwnerSee = true;

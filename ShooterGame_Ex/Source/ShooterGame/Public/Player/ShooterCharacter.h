@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ShooterTypes.h"
+#include "Player/Jetpack.h"
 #include "ShooterCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnShooterCharacterEquipWeapon, AShooterCharacter*, AShooterWeapon* /* new */);
@@ -398,6 +399,9 @@ private:
 	// Damage & death
 
 public:
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Jetpack)
+	UJetpack* Jetpack1P;
 
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
