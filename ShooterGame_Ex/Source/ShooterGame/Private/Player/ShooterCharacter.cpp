@@ -274,20 +274,23 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
 	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	if (ActualDamage > 0.f)
-	{
-		Health -= ActualDamage;
-		if (Health <= 0)
-		{
-			Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
-		}
-		else
-		{
-			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
-		}
 
-		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
+	Health -= ActualDamage;
+	if (Health <= 0)
+	{
+		Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 	}
+	else
+	{
+		UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+		if (ShooterDamageType->Effect == EEffect::Freezing)
+			bIsFreezing = true;
+		PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
+	}
+
+
+	if(ActualDamage > 0.0f)
+		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 
 	return ActualDamage;
 }
@@ -523,11 +526,18 @@ void AShooterCharacter::ReplicateHit(float Damage, struct FDamageEvent const& Da
 		Damage += LastTakeHitInfo.ActualDamage;
 	}
 
+
+	UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+	if (ShooterDamageType->Effect == EEffect::Freezing) {
+		bIsFreezing = true;
+	}
+
 	LastTakeHitInfo.ActualDamage = Damage;
 	LastTakeHitInfo.PawnInstigator = Cast<AShooterCharacter>(PawnInstigator);
 	LastTakeHitInfo.DamageCauser = DamageCauser;
 	LastTakeHitInfo.SetDamageEvent(DamageEvent);
 	LastTakeHitInfo.bKilled = bKilled;
+	LastTakeHitInfo.bFrezzing = bIsFreezing;
 	LastTakeHitInfo.EnsureReplication();
 
 	LastTakeHitTimeTimeout = TimeoutTime;
