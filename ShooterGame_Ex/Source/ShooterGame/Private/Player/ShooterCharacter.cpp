@@ -354,7 +354,7 @@ void AShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& 
 		AShooterPlayerController* PC = Cast<AShooterPlayerController>(Controller);
 		if (PC && DamageEvent.DamageTypeClass)
 		{
-			UShooterDamageType *DamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+			UShooterDamageType* DamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
 			if (DamageType && DamageType->KilledForceFeedback && PC->IsVibrationEnabled())
 			{
 				FForceFeedbackParameters FFParams;
@@ -433,7 +433,7 @@ void AShooterCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& Da
 		AShooterPlayerController* PC = Cast<AShooterPlayerController>(Controller);
 		if (PC && DamageEvent.DamageTypeClass)
 		{
-			UShooterDamageType *DamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+			UShooterDamageType* DamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
 			if (DamageType && DamageType->HitForceFeedback && PC->IsVibrationEnabled())
 			{
 				FForceFeedbackParameters FFParams;
@@ -863,12 +863,14 @@ void AShooterCharacter::StopAllAnimMontages()
 void AShooterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	check(PlayerInputComponent);
+
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShooterCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("MoveUp", this, &AShooterCharacter::MoveUp);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &AShooterCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AShooterCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &AShooterCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AShooterCharacter::LookUpAtRate);
 
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
@@ -917,7 +919,7 @@ void AShooterCharacter::FireTrigger(float Val)
 
 void AShooterCharacter::MoveForward(float Val)
 {
-	if (Controller && Val != 0.f)
+	if (Controller && Val != 0.f && !bIsFreezing)
 	{
 		// Limit pitch when walking or falling
 		const bool bLimitRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
@@ -929,7 +931,7 @@ void AShooterCharacter::MoveForward(float Val)
 
 void AShooterCharacter::MoveRight(float Val)
 {
-	if (Val != 0.f)
+	if (Val != 0.f && !bIsFreezing)
 	{
 		const FQuat Rotation = GetActorQuat();
 		const FVector Direction = FQuatRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
@@ -939,7 +941,7 @@ void AShooterCharacter::MoveRight(float Val)
 
 void AShooterCharacter::MoveUp(float Val)
 {
-	if (Val != 0.f)
+	if (Val != 0.f && !bIsFreezing)
 	{
 		// Not when walking or falling.
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
@@ -953,20 +955,36 @@ void AShooterCharacter::MoveUp(float Val)
 
 void AShooterCharacter::TurnAtRate(float Val)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Val * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	if (!bIsFreezing)
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(Val * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AShooterCharacter::LookUpAtRate(float Val)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Val * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	if (!bIsFreezing)
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(Val * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
+
+void AShooterCharacter::AddControllerPitchInput(float Val)
+{
+	if (!bIsFreezing)
+		Super::AddControllerPitchInput(Val);
+}
+
+
+void AShooterCharacter::AddControllerYawInput(float Val)
+{
+	if (!bIsFreezing)
+		Super::AddControllerYawInput(Val);
+}
+
 
 void AShooterCharacter::OnStartFire()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (IsRunning())
 		{
@@ -984,7 +1002,7 @@ void AShooterCharacter::OnStopFire()
 void AShooterCharacter::OnStartTargeting()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (IsRunning())
 		{
@@ -1002,7 +1020,7 @@ void AShooterCharacter::OnStopTargeting()
 void AShooterCharacter::OnNextWeapon()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
@@ -1016,7 +1034,7 @@ void AShooterCharacter::OnNextWeapon()
 void AShooterCharacter::OnPrevWeapon()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
@@ -1030,7 +1048,7 @@ void AShooterCharacter::OnPrevWeapon()
 void AShooterCharacter::OnReload()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (CurrentWeapon)
 		{
@@ -1042,7 +1060,7 @@ void AShooterCharacter::OnReload()
 void AShooterCharacter::OnStartRunning()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (IsTargeting())
 		{
@@ -1056,7 +1074,7 @@ void AShooterCharacter::OnStartRunning()
 void AShooterCharacter::OnStartRunningToggle()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		if (IsTargeting())
 		{
@@ -1135,10 +1153,10 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	const bool bLocallyControlled = (PC ? PC->IsLocalController() : false);
 	const uint32 UniqueID = GetUniqueID();
 	FAudioThread::RunCommandOnAudioThread([UniqueID, bLocallyControlled]()
-	{
-	    USoundNodeLocalPlayer::GetLocallyControlledActorCache().Add(UniqueID, bLocallyControlled);
-	});
-	
+		{
+			USoundNodeLocalPlayer::GetLocallyControlledActorCache().Add(UniqueID, bLocallyControlled);
+		});
+
 	TArray<FVector> PointsToTest;
 	BuildPauseReplicationCheckPoints(PointsToTest);
 
@@ -1159,16 +1177,16 @@ void AShooterCharacter::BeginDestroy()
 	{
 		const uint32 UniqueID = GetUniqueID();
 		FAudioThread::RunCommandOnAudioThread([UniqueID]()
-		{
-			USoundNodeLocalPlayer::GetLocallyControlledActorCache().Remove(UniqueID);
-		});
+			{
+				USoundNodeLocalPlayer::GetLocallyControlledActorCache().Remove(UniqueID);
+			});
 	}
 }
 
 void AShooterCharacter::OnStartJump()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
 	{
 		bPressedJump = true;
 	}
@@ -1183,7 +1201,7 @@ void AShooterCharacter::OnStopJump()
 void AShooterCharacter::OnStartJetpack()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && Jetpack1P->CanUse())
+	if (MyPC && MyPC->IsGameInputAllowed() && Jetpack1P->CanUse() && !bIsFreezing)
 		Jetpack1P->SetJetpack(true);
 }
 
@@ -1196,7 +1214,7 @@ void AShooterCharacter::OnStopJetpack()
 //////////////////////////////////////////////////////////////////////////
 // Replication
 
-void AShooterCharacter::PreReplication(IRepChangedPropertyTracker & ChangedPropertyTracker)
+void AShooterCharacter::PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker)
 {
 	Super::PreReplication(ChangedPropertyTracker);
 
@@ -1204,7 +1222,7 @@ void AShooterCharacter::PreReplication(IRepChangedPropertyTracker & ChangedPrope
 	DOREPLIFETIME_ACTIVE_OVERRIDE(AShooterCharacter, LastTakeHitInfo, GetWorld() && GetWorld()->GetTimeSeconds() < LastTakeHitTimeTimeout);
 }
 
-void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 

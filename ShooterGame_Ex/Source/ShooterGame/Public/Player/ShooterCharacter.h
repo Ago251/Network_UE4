@@ -423,6 +423,10 @@ public:
 	/** Take damage, handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
+	virtual void AddControllerPitchInput(float Val) override;
+
+	virtual void AddControllerYawInput(float Val) override;
+
 	/** Pawn suicide */
 	virtual void Suicide();
 
