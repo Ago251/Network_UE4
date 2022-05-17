@@ -4,6 +4,13 @@
 
 #include "ShooterDamageType.generated.h"
 
+UENUM(BlueprintType)
+enum EEffect
+{
+	None,
+	Freezing,
+};
+
 // DamageType class that specifies an icon to display
 UCLASS(const, Blueprintable, BlueprintType)
 class UShooterDamageType : public UDamageType
