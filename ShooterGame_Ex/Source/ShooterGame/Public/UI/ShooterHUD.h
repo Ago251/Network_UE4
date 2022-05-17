@@ -344,6 +344,8 @@ protected:
 	/** Draw player's health bar. */
 	void DrawHealth();
 
+	void DrawFreezing();
+
 	/** Draws match timer and player position. */
 	void DrawMatchTimerAndPosition();
 

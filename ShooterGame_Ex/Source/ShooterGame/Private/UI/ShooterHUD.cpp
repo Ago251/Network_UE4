@@ -344,6 +344,17 @@ void AShooterHUD::DrawHealth()
 	Canvas->DrawIcon(HealthIcon,HealthPosX + Offset * ScaleUI, HealthPosY + (HealthBar.VL - HealthIcon.VL) / 2.0f * ScaleUI, ScaleUI);
 }
 
+void AShooterHUD::DrawFreezing()
+{
+	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
+	float EffectValue = 1 - MyPawn->ElapsedFreezingTime / MyPawn->FreezingTime;
+	Canvas->PopSafeZoneTransform();
+	FCanvasTileItem TileItem(FVector2D(0, 0), LowHealthOverlayTexture->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), FLinearColor(0.0f, 0.0f, 255, EffectValue));
+	TileItem.BlendMode = SE_BLEND_Translucent;
+	Canvas->DrawItem(TileItem);
+	Canvas->ApplySafeZoneTransform();
+}
+
 void AShooterHUD::DrawNVIDIAReflexTimers()
 {
 	TArray<ILatencyMarkerModule*> LatencyMarkerModules = IModularFeatures::Get().GetModularFeatureImplementations<ILatencyMarkerModule>(ILatencyMarkerModule::GetModularFeatureName());
@@ -610,6 +621,9 @@ void AShooterHUD::DrawHUD()
 		Canvas->DrawItem( TileItem );
 		Canvas->ApplySafeZoneTransform();
 	}
+
+	if (MyPawn && MyPawn->IsAlive() && MyPawn->bIsFreezing)
+		DrawFreezing();
 
 	// net mode
 	if (GetNetMode() != NM_Standalone)
