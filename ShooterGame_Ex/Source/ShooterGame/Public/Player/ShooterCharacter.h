@@ -413,6 +413,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
 	uint32 bIsDying : 1;
 
+	/** Identifies if pawn is in its freezing state */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
+	uint32 bIsFreezing : 1;
 	// Current health of the Pawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Health)
 	float Health;
