@@ -538,7 +538,6 @@ void AShooterCharacter::ReplicateHit(float Damage, struct FDamageEvent const& Da
 	LastTakeHitInfo.DamageCauser = DamageCauser;
 	LastTakeHitInfo.SetDamageEvent(DamageEvent);
 	LastTakeHitInfo.bKilled = bKilled;
-	LastTakeHitInfo.bFrezzing = bIsFreezing;
 	LastTakeHitInfo.EnsureReplication();
 
 	LastTakeHitTimeTimeout = TimeoutTime;
