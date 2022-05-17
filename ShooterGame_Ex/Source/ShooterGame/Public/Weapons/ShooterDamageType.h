@@ -28,6 +28,9 @@ class UShooterDamageType : public UDamageType
 	/** force feedback effect to play on a player killed by this damage type */
 	UPROPERTY(EditDefaultsOnly, Category=Effects)
 	UForceFeedbackEffect *KilledForceFeedback;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
+	TEnumAsByte<EEffect> Effect;
 };
 
 
