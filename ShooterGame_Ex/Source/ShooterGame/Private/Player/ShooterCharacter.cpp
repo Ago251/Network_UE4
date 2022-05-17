@@ -66,6 +66,7 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	bWantsToRun = false;
 	bWantsToFire = false;
 	LowHealthPercentage = 0.5f;
+	FreezingTime = 5;
 
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -1118,6 +1119,14 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 			{
 				Health = this->GetMaxHealth();
 			}
+		}
+	}
+
+	if (bIsFreezing) {
+		ElapsedFreezingTime += DeltaSeconds;
+		if (ElapsedFreezingTime > FreezingTime) {
+			ElapsedFreezingTime = 0;
+			bIsFreezing = false;
 		}
 	}
 

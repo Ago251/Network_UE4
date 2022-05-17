@@ -410,12 +410,18 @@ public:
 	UJetpack* Jetpack1P;
 
 	/** Identifies if pawn is in its dying state */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  Category = Health)
 	uint32 bIsDying : 1;
 
 	/** Identifies if pawn is in its freezing state */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
 	uint32 bIsFreezing : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+    float FreezingTime;
+
+	float ElapsedFreezingTime;
+
 	// Current health of the Pawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Health)
 	float Health;
