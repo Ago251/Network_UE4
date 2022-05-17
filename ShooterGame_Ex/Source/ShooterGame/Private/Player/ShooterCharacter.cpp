@@ -1210,6 +1210,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > &
 	// everyone
 	DOREPLIFETIME(AShooterCharacter, CurrentWeapon);
 	DOREPLIFETIME(AShooterCharacter, Health);
+	DOREPLIFETIME(AShooterCharacter, bIsFreezing);
 }
 
 bool AShooterCharacter::IsReplicationPausedForConnection(const FNetViewer& ConnectionOwnerNetViewer)
