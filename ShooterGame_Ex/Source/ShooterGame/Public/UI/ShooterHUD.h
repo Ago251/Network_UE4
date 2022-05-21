@@ -250,6 +250,15 @@ protected:
 	UPROPERTY()
 	FCanvasIcon JetpackIcon;
 
+	UPROPERTY()
+	UTexture2D* ShrinkTexture;
+
+	UPROPERTY()
+	FCanvasIcon ShrinkIcon;
+
+	UPROPERTY()
+	FCanvasIcon ShrinkBg;
+
 	/** UI scaling factor for other resolutions than Full HD. */
 	float ScaleUI;
 
@@ -345,6 +354,8 @@ protected:
 	void DrawHealth();
 
 	void DrawFreezing();
+
+	void DrawShrink();
 
 	/** Draws match timer and player position. */
 	void DrawMatchTimerAndPosition();

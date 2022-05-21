@@ -38,6 +38,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	static ConstructorHelpers::FObjectFinder<UTexture2D> HUDAssets02TextureOb(TEXT("/Game/UI/HUD/HUDAssets02"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LowHealthOverlayTextureOb(TEXT("/Game/UI/HUD/LowHealthOverlay"));
 	static ConstructorHelpers::FObjectFinder<UTexture2D> JetpackTextureOb(TEXT("/Game/UI/HUD/jetpack_icon"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> ShrinkTextureOb(TEXT("/Game/UI/HUD/Shrink_icon"));
 
 	// Fonts are not included in dedicated server builds.
 	#if !UE_SERVER
@@ -54,6 +55,7 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	HUDAssets02Texture = HUDAssets02TextureOb.Object;
 	LowHealthOverlayTexture = LowHealthOverlayTextureOb.Object;
 	JetpackTexture = JetpackTextureOb.Object;
+	ShrinkTexture = ShrinkTextureOb.Object;
 
 	HitNotifyIcon[EShooterHudPosition::Left] = UCanvas::MakeIcon(HitNotifyTexture,  158, 831, 585, 392);	
 	HitNotifyIcon[EShooterHudPosition::FrontLeft] = UCanvas::MakeIcon(HitNotifyTexture, 369, 434, 460, 378);	
@@ -82,6 +84,8 @@ AShooterHUD::AShooterHUD(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	JetpackBar = UCanvas::MakeIcon(HUDAssets02Texture, 67, 212, 372, 50);
 	JetpackBarBg = UCanvas::MakeIcon(HUDAssets02Texture, 67, 162, 372, 50);
 	JetpackIcon = UCanvas::MakeIcon(JetpackTexture, 0, 0, 0, 0);
+
+	ShrinkIcon = UCanvas::MakeIcon(ShrinkTexture, 0, 0, 0, 0);
 
 	Crosshair[EShooterCrosshairDirection::Left] = UCanvas::MakeIcon(HUDMainTexture, 43, 402, 25, 9); // left
 	Crosshair[EShooterCrosshairDirection::Right] = UCanvas::MakeIcon(HUDMainTexture, 88, 402, 25, 9); // right
@@ -622,8 +626,15 @@ void AShooterHUD::DrawHUD()
 		Canvas->ApplySafeZoneTransform();
 	}
 
-	if (MyPawn && MyPawn->IsAlive() && MyPawn->bIsFreezing)
-		DrawFreezing();
+	if (MyPawn && MyPawn->IsAlive()) {
+		if (MyPawn->bIsFreezing) {
+			DrawFreezing();
+		}
+
+		if (MyPawn->bIsShrink) {
+			DrawShrink();
+		}
+	}
 
 	// net mode
 	if (GetNetMode() != NM_Standalone)
@@ -1319,6 +1330,20 @@ void AShooterHUD::DrawJetpackFuel() {
 	Canvas->DrawItem(TileItem);
 
 	Canvas->DrawIcon(JetpackIcon, JetpackPosX + Offset * ScaleUI, JetpackPosY + (JetpackBar.VL - JetpackIcon.VL) / 2.0f * ScaleUI, ScaleUI);
+}
+
+void AShooterHUD::DrawShrink()
+{
+	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
+	Canvas->SetDrawColor(FColor::White);
+
+	const float TopScale = 3;
+	const int RemainingTime = MyPawn->ShrinkTime - MyPawn->ElapsedShrinkTime;
+	const float ShrinkPosX = (Canvas->ClipX - Offset * 25 * ScaleUI) / 2;
+	const float ShrinkPosY = Canvas->ClipY - Offset * 4 * ScaleUI;
+	Canvas->DrawIcon(ShrinkIcon, ShrinkPosX, ShrinkPosY, ScaleUI);
+	Canvas->DrawText(NormalFont, FText::FromString(FString::FromInt(RemainingTime)), ShrinkPosX - Offset * 2, ShrinkPosY, TopScale * ScaleUI, TopScale * ScaleUI, ShadowedFont);
+
 }
 
 
