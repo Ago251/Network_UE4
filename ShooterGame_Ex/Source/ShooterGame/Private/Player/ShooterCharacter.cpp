@@ -270,6 +270,18 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 		return 0.f;
 	}
 
+	UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
+	switch (ShooterDamageType->Effect) {
+		case EEffect::Freezing:
+			bIsFreezing = true;
+			break;
+		case EEffect::Shrink:
+			bIsShrink = true;
+			break;
+		case EEffect::None:
+			break;
+	}
+
 	// Modify based on game rules.
 	AShooterGameMode* const Game = GetWorld()->GetAuthGameMode<AShooterGameMode>();
 	Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
@@ -283,9 +295,6 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	}
 	else
 	{
-		UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
-		if (ShooterDamageType->Effect == EEffect::Freezing)
-			bIsFreezing = true;
 		PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
 	}
 
@@ -351,6 +360,7 @@ void AShooterCharacter::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Oth
 		}
 	}
 }
+
 
 void AShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
 {
@@ -541,12 +551,6 @@ void AShooterCharacter::ReplicateHit(float Damage, struct FDamageEvent const& Da
 
 		// otherwise, accumulate damage done this frame
 		Damage += LastTakeHitInfo.ActualDamage;
-	}
-
-
-	UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
-	if (ShooterDamageType->Effect == EEffect::Freezing) {
-		bIsFreezing = true;
 	}
 
 	LastTakeHitInfo.ActualDamage = Damage;
@@ -1263,6 +1267,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& 
 	DOREPLIFETIME(AShooterCharacter, CurrentWeapon);
 	DOREPLIFETIME(AShooterCharacter, Health);
 	DOREPLIFETIME(AShooterCharacter, bIsFreezing);
+	DOREPLIFETIME(AShooterCharacter, bIsShrink);
 }
 
 bool AShooterCharacter::IsReplicationPausedForConnection(const FNetViewer& ConnectionOwnerNetViewer)

@@ -9,6 +9,7 @@ enum EEffect
 {
 	None,
 	Freezing,
+	Shrink,
 };
 
 // DamageType class that specifies an icon to display
