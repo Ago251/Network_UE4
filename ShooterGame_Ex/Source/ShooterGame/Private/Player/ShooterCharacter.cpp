@@ -281,6 +281,9 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 		case EEffect::Shrink:
 			bIsShrink = true;
 			break;
+		case EEffect::StepOn:
+			Damage = Health;
+			break;
 		case EEffect::None:
 			break;
 	}

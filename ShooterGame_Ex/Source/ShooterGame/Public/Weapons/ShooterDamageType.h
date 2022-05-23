@@ -10,6 +10,7 @@ enum EEffect
 	None,
 	Freezing,
 	Shrink,
+	StepOn,
 };
 
 // DamageType class that specifies an icon to display
