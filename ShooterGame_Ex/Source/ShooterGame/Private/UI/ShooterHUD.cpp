@@ -11,6 +11,7 @@
 #include "Online/ShooterPlayerState.h"
 #include "Misc/NetworkVersion.h"
 #include "OnlineSubsystemUtils.h"
+#include "GenericPlatform/GenericPlatformMath.h"
 #include "ShooterGameUserSettings.h"
 #include "Performance/LatencyMarkerModule.h"
 
@@ -1337,12 +1338,12 @@ void AShooterHUD::DrawShrink()
 	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
 	Canvas->SetDrawColor(FColor::White);
 
-	const float TopScale = 3;
-	const int RemainingTime = MyPawn->ShrinkTime - MyPawn->ElapsedShrinkTime;
+	const float TextScale = 3;
+	const float RemainingTime = FGenericPlatformMath::RoundToInt(MyPawn->ShrinkTime - MyPawn->ElapsedShrinkTime);
 	const float ShrinkPosX = (Canvas->ClipX - Offset * 25 * ScaleUI) / 2;
 	const float ShrinkPosY = Canvas->ClipY - Offset * 4 * ScaleUI;
 	Canvas->DrawIcon(ShrinkIcon, ShrinkPosX, ShrinkPosY, ScaleUI);
-	Canvas->DrawText(NormalFont, FText::FromString(FString::FromInt(RemainingTime)), ShrinkPosX - Offset * 2, ShrinkPosY, TopScale * ScaleUI, TopScale * ScaleUI, ShadowedFont);
+	Canvas->DrawText(NormalFont, FText::FromString(FString::FromInt(RemainingTime)), ShrinkPosX - Offset * 2, ShrinkPosY, TextScale * ScaleUI, TextScale * ScaleUI, ShadowedFont);
 
 }
 
