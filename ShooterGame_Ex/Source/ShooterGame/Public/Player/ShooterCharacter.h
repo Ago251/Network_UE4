@@ -114,6 +114,8 @@ class AShooterCharacter : public ACharacter
 	/** [server + local] change running state */
 	void SetRunning(bool bNewRunning, bool bToggle);
 
+	void SetScale(FVector Scale);
+
 	//////////////////////////////////////////////////////////////////////////
 	// Animations
 
