@@ -427,10 +427,25 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
 	FVector ScaleValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Malus)
+	FVector OffsetValue;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
     float FreezingTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
+	float ShrinkTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
+	FVector ShrinkScale;
+
 	float ElapsedFreezingTime;
+
+	float ElapsedShrinkTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
+	float ResizeTime;
 
 	// Current health of the Pawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Health)
@@ -452,6 +467,9 @@ public:
 	/** Returns True if the pawn can die in the current state */
 	virtual bool CanDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
 
+	void SetLerpScale(FVector StartScale, FVector EndScale, float Alpha);
+
+	void ExecuteShrinkEffect(float DeltaSeconds);
 	/**
 	* Kills pawn.  Server/authority only.
 	* @param KillingDamage - Damage amount of the killing blow

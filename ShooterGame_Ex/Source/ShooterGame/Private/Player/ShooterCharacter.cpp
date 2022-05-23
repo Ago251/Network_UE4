@@ -67,6 +67,8 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	bWantsToFire = false;
 	LowHealthPercentage = 0.5f;
 	FreezingTime = 5;
+	ShrinkTime = 10;
+	ResizeTime = 2;
 
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -1170,6 +1172,10 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	if (bIsShrink) {
+		ExecuteShrinkEffect(DeltaSeconds);
+	}
+
 	if (GEngine->UseSound())
 	{
 		if (LowHealthSound)
@@ -1218,6 +1224,29 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void AShooterCharacter::ExecuteShrinkEffect(float DeltaSeconds) {
+	ElapsedShrinkTime += DeltaSeconds;
+	if (ElapsedShrinkTime > ShrinkTime) {
+		ElapsedShrinkTime = 0;
+		bIsShrink = false;
+	}
+
+	if (ElapsedShrinkTime <= ResizeTime) {
+		float alpha = FMath::Clamp(ElapsedShrinkTime / ResizeTime, 0.0f, 1.0f);
+		offsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
+		SetLerpScale(FVector(1, 1, 1), ShrinkScale, alpha);
+	}
+
+	if (ElapsedShrinkTime >= ShrinkTime - ResizeTime) {
+		float alpha = FMath::Clamp((ElapsedShrinkTime - (ShrinkTime - ResizeTime)) / ResizeTime, 0.0f, 1.0f);
+		offsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
+		SetLerpScale(ShrinkScale, FVector(1, 1, 1), alpha);
+	}
+void AShooterCharacter::SetLerpScale(FVector StartScale, FVector EndScale, float Alpha) {
+	ScaleValue = FMath::Lerp(StartScale, EndScale, Alpha);
+	SetScale(ScaleValue);
+}
+}
 void AShooterCharacter::BeginDestroy()
 {
 	Super::BeginDestroy();
