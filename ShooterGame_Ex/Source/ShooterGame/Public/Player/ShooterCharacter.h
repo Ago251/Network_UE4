@@ -4,6 +4,8 @@
 
 #include "ShooterTypes.h"
 #include "Player/Jetpack.h"
+#include "Weapons/ShooterDamageType.h"
+#include "Weapons/ShooterWeapon_Instant.h"
 #include "ShooterCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnShooterCharacterEquipWeapon, AShooterCharacter*, AShooterWeapon* /* new */);
