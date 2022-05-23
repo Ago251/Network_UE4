@@ -70,6 +70,7 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	ShrinkTime = 10;
 	ResizeTime = 2;
 
+	StandUpEyeHeight = 64.f;
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 }
@@ -826,6 +827,7 @@ void AShooterCharacter::SetScale(FVector Scale)
 		ServerSetScale(Scale);
 	}
 }
+
 bool AShooterCharacter::ServerSetScale_Validate(FVector Scale)
 {
 	return true;
@@ -835,6 +837,7 @@ void AShooterCharacter::ServerSetScale_Implementation(FVector Scale)
 {
 	SetScale(Scale);
 }
+
 void AShooterCharacter::UpdateRunSounds()
 {
 	const bool bIsRunSoundPlaying = RunLoopAC != nullptr && RunLoopAC->IsActive();
@@ -1233,20 +1236,37 @@ void AShooterCharacter::ExecuteShrinkEffect(float DeltaSeconds) {
 
 	if (ElapsedShrinkTime <= ResizeTime) {
 		float alpha = FMath::Clamp(ElapsedShrinkTime / ResizeTime, 0.0f, 1.0f);
-		offsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
+		OffsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
 		SetLerpScale(FVector(1, 1, 1), ShrinkScale, alpha);
 	}
 
 	if (ElapsedShrinkTime >= ShrinkTime - ResizeTime) {
 		float alpha = FMath::Clamp((ElapsedShrinkTime - (ShrinkTime - ResizeTime)) / ResizeTime, 0.0f, 1.0f);
-		offsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
+		OffsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
 		SetLerpScale(ShrinkScale, FVector(1, 1, 1), alpha);
 	}
+
+	RecalculateBaseEyeHeight();
+}
+
 void AShooterCharacter::SetLerpScale(FVector StartScale, FVector EndScale, float Alpha) {
 	ScaleValue = FMath::Lerp(StartScale, EndScale, Alpha);
 	SetScale(ScaleValue);
 }
+
+void AShooterCharacter::RecalculateBaseEyeHeight()
+{
+	if (bIsCrouched)
+	{
+		BaseEyeHeight = CrouchedEyeHeight;
+	}
+	else{
+		BaseEyeHeight = StandUpEyeHeight;
+	}
+
+	BaseEyeHeight -= OffsetViewHeight;
 }
+
 void AShooterCharacter::BeginDestroy()
 {
 	Super::BeginDestroy();

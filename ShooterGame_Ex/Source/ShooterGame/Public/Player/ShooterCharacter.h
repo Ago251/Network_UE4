@@ -451,6 +451,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Health)
 	float Health;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	float StandUpEyeHeight;
+
+	float OffsetViewHeight;
+
 	/** Take damage, handle death */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
@@ -470,6 +475,9 @@ public:
 	void SetLerpScale(FVector StartScale, FVector EndScale, float Alpha);
 
 	void ExecuteShrinkEffect(float DeltaSeconds);
+
+	virtual void RecalculateBaseEyeHeight() override;
+
 	/**
 	* Kills pawn.  Server/authority only.
 	* @param KillingDamage - Damage amount of the killing blow
