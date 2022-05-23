@@ -812,6 +812,27 @@ void AShooterCharacter::ServerSetRunning_Implementation(bool bNewRunning, bool b
 	SetRunning(bNewRunning, bToggle);
 }
 
+
+
+void AShooterCharacter::SetScale(FVector Scale)
+{
+	SetActorRelativeScale3D(Scale);
+	ScaleValue = Scale;
+	
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerSetScale(Scale);
+	}
+}
+bool AShooterCharacter::ServerSetScale_Validate(FVector Scale)
+{
+	return true;
+}
+
+void AShooterCharacter::ServerSetScale_Implementation(FVector Scale)
+{
+	SetScale(Scale);
+}
 void AShooterCharacter::UpdateRunSounds()
 {
 	const bool bIsRunSoundPlaying = RunLoopAC != nullptr && RunLoopAC->IsActive();
@@ -1248,6 +1269,7 @@ void AShooterCharacter::PreReplication(IRepChangedPropertyTracker& ChangedProper
 
 	// Only replicate this property for a short duration after it changes so join in progress players don't get spammed with fx when joining late
 	DOREPLIFETIME_ACTIVE_OVERRIDE(AShooterCharacter, LastTakeHitInfo, GetWorld() && GetWorld()->GetTimeSeconds() < LastTakeHitTimeTimeout);
+	DOREPLIFETIME_ACTIVE_OVERRIDE(AShooterCharacter, ScaleValue, bIsShrink);
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const

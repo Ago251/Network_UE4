@@ -422,6 +422,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
 	uint32 bIsShrink : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
+	FVector ScaleValue;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
     float FreezingTime;
 
@@ -506,6 +509,9 @@ protected:
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetRunning(bool bNewRunning, bool bToggle);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetScale(FVector Scale);
 
 	/** Builds list of points to check for pausing replication for a connection*/
 	void BuildPauseReplicationCheckPoints(TArray<FVector>& RelevancyCheckPoints);
