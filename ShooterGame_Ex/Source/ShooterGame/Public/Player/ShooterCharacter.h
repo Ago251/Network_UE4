@@ -284,6 +284,9 @@ private:
 	/** pawn mesh: 1st person view */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FInstantWeaponData StepOnConfig;
 protected:
 
 	/** socket or bone name for attaching weapon mesh */
@@ -417,6 +420,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
 	uint32 bIsFreezing : 1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
+	uint32 bIsShrink : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
     float FreezingTime;
 

@@ -335,6 +335,22 @@ bool AShooterCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent
 	return true;
 }
 
+void AShooterCharacter::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) {
+	AShooterCharacter* character = Cast<AShooterCharacter>(Other);
+	if (character) {
+		if (character->bIsShrink) {
+			FVector direction = HitLocation - GetActorLocation();
+			direction.Normalize();
+			if (direction.Z < -0.7) {
+				FPointDamageEvent PointDmg;
+				PointDmg.DamageTypeClass = StepOnConfig.DamageType;
+				PointDmg.HitInfo = Hit;
+				PointDmg.Damage = StepOnConfig.HitDamage;
+				character->TakeDamage(StepOnConfig.HitDamage, PointDmg, Controller, this);
+			}
+		}
+	}
+}
 
 void AShooterCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
 {
