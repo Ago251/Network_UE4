@@ -276,10 +276,18 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
 	switch (ShooterDamageType->Effect) {
 		case EEffect::Freezing:
-			bIsFreezing = true;
+			if (!bIsFreezing) {
+				FreezingEffect = Cast<UShooterFreezingDamageType>(ShooterDamageType);
+				ElapsedFreezingTime = 0;
+				bIsFreezing = true;
+			}
 			break;
 		case EEffect::Shrink:
-			bIsShrink = true;
+			if (!bIsShrink) {
+				ShrinkEffect = Cast<UShooterShrinkDamageType>(ShooterDamageType);
+				ElapsedShrinkTime = 0;
+				bIsShrink = true;
+			}
 			break;
 		case EEffect::StepOn:
 			Damage = Health;
@@ -1171,11 +1179,7 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	}
 
 	if (bIsFreezing) {
-		ElapsedFreezingTime += DeltaSeconds;
-		if (ElapsedFreezingTime > FreezingTime) {
-			ElapsedFreezingTime = 0;
-			bIsFreezing = false;
-		}
+		ExecuteFreezingEffect(DeltaSeconds);
 	}
 
 	if (bIsShrink) {
@@ -1230,26 +1234,38 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void AShooterCharacter::ExecuteFreezingEffect(float DeltaSeconds) {
+	if (FreezingEffect) {
+		ElapsedFreezingTime += DeltaSeconds;
+		if (ElapsedFreezingTime > FreezingEffect->FreezingTime) {
+			ElapsedFreezingTime = 0;
+			bIsFreezing = false;
+		}
+	}
+}
+
 void AShooterCharacter::ExecuteShrinkEffect(float DeltaSeconds) {
-	ElapsedShrinkTime += DeltaSeconds;
-	if (ElapsedShrinkTime > ShrinkTime) {
-		ElapsedShrinkTime = 0;
-		bIsShrink = false;
-	}
+	if (ShrinkEffect) {
+		ElapsedShrinkTime += DeltaSeconds;
+		if (ElapsedShrinkTime > ShrinkEffect->ShrinkTime) {
+			ElapsedShrinkTime = 0;
+			bIsShrink = false;
+		}
 
-	if (ElapsedShrinkTime <= ResizeTime) {
-		float alpha = FMath::Clamp(ElapsedShrinkTime / ResizeTime, 0.0f, 1.0f);
-		OffsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
-		SetLerpScale(FVector(1, 1, 1), ShrinkScale, alpha);
-	}
+		if (ElapsedShrinkTime <= ShrinkEffect->ResizeTime) {
+			float alpha = FMath::Clamp(ElapsedShrinkTime / ShrinkEffect->ResizeTime, 0.0f, 1.0f);
+			OffsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
+			SetLerpScale(FVector(1, 1, 1), ShrinkEffect->ShrinkScale, alpha);
+		}
 
-	if (ElapsedShrinkTime >= ShrinkTime - ResizeTime) {
-		float alpha = FMath::Clamp((ElapsedShrinkTime - (ShrinkTime - ResizeTime)) / ResizeTime, 0.0f, 1.0f);
-		OffsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
-		SetLerpScale(ShrinkScale, FVector(1, 1, 1), alpha);
-	}
+		if (ElapsedShrinkTime >= ShrinkEffect->ShrinkTime - ShrinkEffect->ResizeTime) {
+			float alpha = FMath::Clamp((ElapsedShrinkTime - (ShrinkEffect->ShrinkTime - ShrinkEffect->ResizeTime)) / ShrinkEffect->ResizeTime, 0.0f, 1.0f);
+			OffsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
+			SetLerpScale(ShrinkEffect->ShrinkScale, FVector(1, 1, 1), alpha);
+		}
 
-	RecalculateBaseEyeHeight();
+		RecalculateBaseEyeHeight();
+	}
 }
 
 void AShooterCharacter::SetLerpScale(FVector StartScale, FVector EndScale, float Alpha) {
@@ -1338,6 +1354,8 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& 
 	DOREPLIFETIME_CONDITION(AShooterCharacter, LastTakeHitInfo, COND_Custom);
 
 	// everyone
+	DOREPLIFETIME(AShooterCharacter, ShrinkEffect);
+	DOREPLIFETIME(AShooterCharacter, FreezingEffect);
 	DOREPLIFETIME(AShooterCharacter, CurrentWeapon);
 	DOREPLIFETIME(AShooterCharacter, Health);
 	DOREPLIFETIME(AShooterCharacter, bIsFreezing);

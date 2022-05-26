@@ -352,7 +352,7 @@ void AShooterHUD::DrawHealth()
 void AShooterHUD::DrawFreezing()
 {
 	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
-	float EffectValue = 1 - MyPawn->ElapsedFreezingTime / MyPawn->FreezingTime;
+	float EffectValue = 1 - MyPawn->ElapsedFreezingTime / MyPawn->FreezingEffect->FreezingTime;
 	Canvas->PopSafeZoneTransform();
 	FCanvasTileItem TileItem(FVector2D(0, 0), LowHealthOverlayTexture->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), FLinearColor(0.0f, 0.0f, 255, EffectValue));
 	TileItem.BlendMode = SE_BLEND_Translucent;
@@ -1336,14 +1336,16 @@ void AShooterHUD::DrawJetpackFuel() {
 void AShooterHUD::DrawShrink()
 {
 	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
-	Canvas->SetDrawColor(FColor::White);
+	if (MyPawn->ShrinkEffect) {
+		Canvas->SetDrawColor(FColor::White);
 
-	const float TextScale = 3;
-	const float RemainingTime = FGenericPlatformMath::RoundToInt(MyPawn->ShrinkTime - MyPawn->ElapsedShrinkTime);
-	const float ShrinkPosX = (Canvas->ClipX - Offset * 25 * ScaleUI) / 2;
-	const float ShrinkPosY = Canvas->ClipY - Offset * 4 * ScaleUI;
-	Canvas->DrawIcon(ShrinkIcon, ShrinkPosX, ShrinkPosY, ScaleUI);
-	Canvas->DrawText(NormalFont, FText::FromString(FString::FromInt(RemainingTime)), ShrinkPosX - Offset * 2, ShrinkPosY, TextScale * ScaleUI, TextScale * ScaleUI, ShadowedFont);
+		const float TextScale = 3;
+		const float RemainingTime = FGenericPlatformMath::RoundToInt(MyPawn->ShrinkEffect->ShrinkTime - MyPawn->ElapsedShrinkTime);
+		const float ShrinkPosX = (Canvas->ClipX - Offset * 25 * ScaleUI) / 2;
+		const float ShrinkPosY = Canvas->ClipY - Offset * 4 * ScaleUI;
+		Canvas->DrawIcon(ShrinkIcon, ShrinkPosX, ShrinkPosY, ScaleUI);
+		Canvas->DrawText(NormalFont, FText::FromString(FString::FromInt(RemainingTime)), ShrinkPosX - Offset * 2, ShrinkPosY, TextScale * ScaleUI, TextScale * ScaleUI, ShadowedFont);
+	}
 
 }
 

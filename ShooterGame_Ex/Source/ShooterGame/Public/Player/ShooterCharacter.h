@@ -6,6 +6,8 @@
 #include "Player/Jetpack.h"
 #include "Weapons/ShooterDamageType.h"
 #include "Weapons/ShooterWeapon_Instant.h"
+#include "ShooterShrinkDamageType.h"
+#include "ShooterFreezingDamageType.h"
 #include "ShooterCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnShooterCharacterEquipWeapon, AShooterCharacter*, AShooterWeapon* /* new */);
@@ -116,6 +118,7 @@ class AShooterCharacter : public ACharacter
 	/** [server + local] change running state */
 	void SetRunning(bool bNewRunning, bool bToggle);
 
+	/** [server + local] change running state */
 	void SetScale(FVector Scale);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -436,14 +439,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
     float FreezingTime;
 
+	UPROPERTY(Replicated)
+	UShooterFreezingDamageType* FreezingEffect;
+
+	UPROPERTY(Replicated)
+	UShooterShrinkDamageType* ShrinkEffect;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	float ShrinkTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	FVector ShrinkScale;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedFreezingTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedShrinkTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
@@ -477,6 +488,8 @@ public:
 	void SetLerpScale(FVector StartScale, FVector EndScale, float Alpha);
 
 	void ExecuteShrinkEffect(float DeltaSeconds);
+
+	void ExecuteFreezingEffect(float DeltaSeconds);
 
 	virtual void RecalculateBaseEyeHeight() override;
 

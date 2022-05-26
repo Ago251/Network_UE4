@@ -38,7 +38,6 @@ void UShooterCharacterMovement::PhysCustom(float deltaTime, int32 Iterations) {
 		case CUSTOM_Jetpack:
 			ShooterCharacterOwner->Jetpack1P->PhysJetpack(deltaTime, Iterations);
 			break;
-
 		default:
 			break;
 	}
