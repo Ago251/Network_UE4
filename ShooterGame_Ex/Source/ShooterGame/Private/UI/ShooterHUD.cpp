@@ -352,12 +352,14 @@ void AShooterHUD::DrawHealth()
 void AShooterHUD::DrawFreezing()
 {
 	AShooterCharacter* MyPawn = Cast<AShooterCharacter>(GetOwningPawn());
-	float EffectValue = 1 - MyPawn->ElapsedFreezingTime / MyPawn->FreezingEffect->FreezingTime;
-	Canvas->PopSafeZoneTransform();
-	FCanvasTileItem TileItem(FVector2D(0, 0), LowHealthOverlayTexture->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), FLinearColor(0.0f, 0.0f, 255, EffectValue));
-	TileItem.BlendMode = SE_BLEND_Translucent;
-	Canvas->DrawItem(TileItem);
-	Canvas->ApplySafeZoneTransform();
+	if (MyPawn->FreezingEffect) {
+		float EffectValue = 1 - MyPawn->ElapsedFreezingTime / MyPawn->FreezingEffect->FreezingTime;
+		Canvas->PopSafeZoneTransform();
+		FCanvasTileItem TileItem(FVector2D(0, 0), LowHealthOverlayTexture->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), FLinearColor(0.0f, 0.0f, 255, EffectValue));
+		TileItem.BlendMode = SE_BLEND_Translucent;
+		Canvas->DrawItem(TileItem);
+		Canvas->ApplySafeZoneTransform();
+	}
 }
 
 void AShooterHUD::DrawNVIDIAReflexTimers()

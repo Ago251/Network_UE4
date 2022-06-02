@@ -827,8 +827,8 @@ void AShooterCharacter::ServerSetRunning_Implementation(bool bNewRunning, bool b
 
 void AShooterCharacter::SetScale(FVector Scale)
 {
-	SetActorRelativeScale3D(Scale);
 	ScaleValue = Scale;
+	SetActorRelativeScale3D(ScaleValue);
 	
 	if (GetLocalRole() < ROLE_Authority)
 	{
