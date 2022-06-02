@@ -436,9 +436,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Malus)
 	FVector OffsetValue;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-    float FreezingTime;
-
 	UPROPERTY(Replicated)
 	UShooterFreezingDamageType* FreezingEffect;
 
@@ -446,19 +443,10 @@ public:
 	UShooterShrinkDamageType* ShrinkEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
-	float ShrinkTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
-	FVector ShrinkScale;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedFreezingTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedShrinkTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
-	float ResizeTime;
 
 	// Current health of the Pawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Health)

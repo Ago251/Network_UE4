@@ -66,9 +66,6 @@ AShooterCharacter::AShooterCharacter(const FObjectInitializer& ObjectInitializer
 	bWantsToRun = false;
 	bWantsToFire = false;
 	LowHealthPercentage = 0.5f;
-	FreezingTime = 5;
-	ShrinkTime = 10;
-	ResizeTime = 2;
 
 	StandUpEyeHeight = 64.f;
 	BaseTurnRate = 45.f;
