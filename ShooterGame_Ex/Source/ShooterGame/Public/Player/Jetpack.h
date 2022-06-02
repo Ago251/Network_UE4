@@ -39,11 +39,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
 	float TimeRecover;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fuel")
+	float Fuel;
+
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Fuel")
 	bool bUseJetpack;
 
 private:
-
-	float Fuel;
 	float ElapsedTime;
 	AShooterCharacter* ShooterCharacterOwner;
 	UCharacterMovementComponent* CharacterMovement;
@@ -62,6 +64,8 @@ public:
 	bool CanUse();
 
 	void RecoverJetpackFuel(float DeltaTime);
+
+	void ConsumeJetpackFuel(float DeltaTime);
 
 	void SetJetpack(bool useRequest);
 

@@ -14,7 +14,7 @@ UJetpack::UJetpack()
 	Fuel = 50;
 	FuelRecover = 0.1;
 	FuelConsume = 10;
-	TimeFuelConsume = 1;
+	TimeFuelConsume = 0.1;
 	TimeRecover = 10;
 	MaxSpeed = 1000;
 	// ...
@@ -38,8 +38,12 @@ void UJetpack::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	RecoverJetpackFuel(DeltaTime);
-	// ...
+	if (bUseJetpack) {
+		ConsumeJetpackFuel(DeltaTime);
+	}
+	else {
+		RecoverJetpackFuel(DeltaTime);
+	}
 }
 
 bool UJetpack::CanUse() { 
@@ -47,17 +51,17 @@ bool UJetpack::CanUse() {
 }
 
 void UJetpack::RecoverJetpackFuel(float DeltaTime) {
-	if (!bUseJetpack) {
-		float FuelRecovered = FuelRecover * (DeltaTime * TimeRecover);
-		Fuel = FMath::Clamp(Fuel + FuelRecover, 0.0f, MaxFuel);
-	}
+	float FuelRecovered = FuelRecover * (DeltaTime * TimeRecover);
+	Fuel = FMath::Clamp(Fuel + FuelRecover, 0.0f, MaxFuel);
+}
+
+void UJetpack::ConsumeJetpackFuel(float DeltaTime) {
+	float FuelConsumed = FuelConsume * (DeltaTime * TimeFuelConsume);
+	Fuel = FMath::Clamp(Fuel - FuelConsumed, 0.0f, MaxFuel);
 }
 
 void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	float JetDir = CharacterMovement->GetGravityZ() * -1;
-
-	float FuelConsumed = FuelConsume * (deltaTime / TimeFuelConsume);
-	Fuel = FMath::Clamp(Fuel - FuelConsumed, 0.0f, MaxFuel);
 
 	if (Fuel <= 0.0f) {
 		bUseJetpack = false;
@@ -73,6 +77,8 @@ void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 }
 
 void UJetpack::SetJetpack(bool useRequest) {
+	bUseJetpack = useRequest;
+
 	if (!GetOwner()->HasAuthority() && ShooterCharacterOwner->IsLocallyControlled())
 		ServerJetpack(useRequest);
 	else
@@ -102,5 +108,12 @@ void UJetpack::ServerJetpack_Implementation(bool useRequest) {
 		ExecJetpack(useRequest);
 	else if (!useRequest)
 		ExecJetpack(useRequest);
+}
+
+void UJetpack::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UJetpack, bUseJetpack);
 }
 
