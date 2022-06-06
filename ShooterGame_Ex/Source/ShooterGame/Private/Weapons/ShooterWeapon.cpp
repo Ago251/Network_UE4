@@ -340,14 +340,14 @@ void AShooterWeapon::ClientStartReload_Implementation()
 
 bool AShooterWeapon::CanFire() const
 {
-	bool bCanFire = MyPawn && MyPawn->CanFire();
+	bool bCanFire = MyPawn && MyPawn->CanFire() && MyPawn->bIsFreezing == false;
 	bool bStateOKToFire = ( ( CurrentState ==  EWeaponState::Idle ) || ( CurrentState == EWeaponState::Firing) );	
 	return (( bCanFire == true ) && ( bStateOKToFire == true ) && ( bPendingReload == false ));
 }
 
 bool AShooterWeapon::CanReload() const
 {
-	bool bCanReload = (!MyPawn || MyPawn->CanReload());
+	bool bCanReload = (!MyPawn || MyPawn->CanReload()) && MyPawn->bIsFreezing == false;
 	bool bGotAmmo = ( CurrentAmmoInClip < WeaponConfig.AmmoPerClip) && (CurrentAmmo - CurrentAmmoInClip > 0 || HasInfiniteClip());
 	bool bStateOKToReload = ( ( CurrentState ==  EWeaponState::Idle ) || ( CurrentState == EWeaponState::Firing) );
 	return ( ( bCanReload == true ) && ( bGotAmmo == true ) && ( bStateOKToReload == true) );	
