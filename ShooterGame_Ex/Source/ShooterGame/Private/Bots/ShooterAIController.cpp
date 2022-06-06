@@ -243,9 +243,10 @@ class AShooterCharacter* AShooterAIController::GetEnemy() const
 
 void AShooterAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
 {
+	AShooterBot* MyBot = Cast<AShooterBot>(GetPawn());
 	// Look toward focus
 	FVector FocalPoint = GetFocalPoint();
-	if( !FocalPoint.IsZero() && GetPawn())
+	if( !FocalPoint.IsZero() && MyBot && !MyBot->bIsFreezing)
 	{
 		FVector Direction = FocalPoint - GetPawn()->GetActorLocation();
 		FRotator NewControlRotation = Direction.Rotation();
