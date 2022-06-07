@@ -271,7 +271,8 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	}
 
 	UShooterDamageType* ShooterDamageType = Cast<UShooterDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
-	switch (ShooterDamageType->Effect) {
+	if (ShooterDamageType) {
+		switch (ShooterDamageType->Effect) {
 		case EEffect::Freezing:
 			if (!bIsFreezing) {
 				FreezingEffect = Cast<UShooterFreezingDamageType>(ShooterDamageType);
@@ -291,6 +292,7 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 			break;
 		case EEffect::None:
 			break;
+		}
 	}
 
 	// Modify based on game rules.
@@ -766,12 +768,12 @@ void AShooterCharacter::StopWeaponFire()
 
 bool AShooterCharacter::CanFire() const
 {
-	return IsAlive();
+	return IsAlive() && bIsFreezing == false;
 }
 
 bool AShooterCharacter::CanReload() const
 {
-	return true;
+	return bIsFreezing == false;
 }
 
 void AShooterCharacter::SetTargeting(bool bNewTargeting)
