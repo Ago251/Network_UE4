@@ -825,29 +825,6 @@ void AShooterCharacter::ServerSetRunning_Implementation(bool bNewRunning, bool b
 	SetRunning(bNewRunning, bToggle);
 }
 
-
-
-void AShooterCharacter::SetScale(FVector Scale)
-{
-	ScaleValue = Scale;
-	SetActorRelativeScale3D(ScaleValue);
-	
-	if (GetLocalRole() < ROLE_Authority)
-	{
-		ServerSetScale(Scale);
-	}
-}
-
-bool AShooterCharacter::ServerSetScale_Validate(FVector Scale)
-{
-	return true;
-}
-
-void AShooterCharacter::ServerSetScale_Implementation(FVector Scale)
-{
-	SetScale(Scale);
-}
-
 void AShooterCharacter::UpdateRunSounds()
 {
 	const bool bIsRunSoundPlaying = RunLoopAC != nullptr && RunLoopAC->IsActive();
@@ -1254,22 +1231,17 @@ void AShooterCharacter::ExecuteShrinkEffect(float DeltaSeconds) {
 		if (ElapsedShrinkTime <= ShrinkEffect->ResizeTime) {
 			float alpha = FMath::Clamp(ElapsedShrinkTime / ShrinkEffect->ResizeTime, 0.0f, 1.0f);
 			OffsetViewHeight = FMath::Lerp(0.0f, 50.0f, alpha);
-			SetLerpScale(FVector(1, 1, 1), ShrinkEffect->ShrinkScale, alpha);
+			SetActorRelativeScale3D(FMath::Lerp(FVector(1, 1, 1), ShrinkEffect->ShrinkScale, alpha));
 		}
 
 		if (ElapsedShrinkTime >= ShrinkEffect->ShrinkTime - ShrinkEffect->ResizeTime) {
 			float alpha = FMath::Clamp((ElapsedShrinkTime - (ShrinkEffect->ShrinkTime - ShrinkEffect->ResizeTime)) / ShrinkEffect->ResizeTime, 0.0f, 1.0f);
 			OffsetViewHeight = FMath::Lerp(50.0f, 0.0f, alpha);
-			SetLerpScale(ShrinkEffect->ShrinkScale, FVector(1, 1, 1), alpha);
+			SetActorRelativeScale3D(FMath::Lerp(ShrinkEffect->ShrinkScale, FVector(1, 1, 1), alpha));
 		}
 
 		RecalculateBaseEyeHeight();
 	}
-}
-
-void AShooterCharacter::SetLerpScale(FVector StartScale, FVector EndScale, float Alpha) {
-	ScaleValue = FMath::Lerp(StartScale, EndScale, Alpha);
-	SetScale(ScaleValue);
 }
 
 void AShooterCharacter::RecalculateBaseEyeHeight()
@@ -1336,7 +1308,6 @@ void AShooterCharacter::PreReplication(IRepChangedPropertyTracker& ChangedProper
 
 	// Only replicate this property for a short duration after it changes so join in progress players don't get spammed with fx when joining late
 	DOREPLIFETIME_ACTIVE_OVERRIDE(AShooterCharacter, LastTakeHitInfo, GetWorld() && GetWorld()->GetTimeSeconds() < LastTakeHitTimeTimeout);
-	DOREPLIFETIME_ACTIVE_OVERRIDE(AShooterCharacter, ScaleValue, bIsShrink);
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -1359,6 +1330,8 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& 
 	DOREPLIFETIME(AShooterCharacter, Health);
 	DOREPLIFETIME(AShooterCharacter, bIsFreezing);
 	DOREPLIFETIME(AShooterCharacter, bIsShrink);
+	DOREPLIFETIME(AShooterCharacter, ElapsedFreezingTime);
+	DOREPLIFETIME(AShooterCharacter, ElapsedShrinkTime);
 }
 
 bool AShooterCharacter::IsReplicationPausedForConnection(const FNetViewer& ConnectionOwnerNetViewer)

@@ -430,9 +430,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
 	uint32 bIsShrink : 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
-	FVector ScaleValue;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Malus)
 	FVector OffsetValue;
 
@@ -442,10 +439,10 @@ public:
 	UPROPERTY(Replicated)
 	UShooterShrinkDamageType* ShrinkEffect;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedFreezingTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shrink")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Shrink")
 	float ElapsedShrinkTime;
 
 	// Current health of the Pawn
@@ -472,8 +469,6 @@ public:
 
 	/** Returns True if the pawn can die in the current state */
 	virtual bool CanDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
-
-	void SetLerpScale(FVector StartScale, FVector EndScale, float Alpha);
 
 	void ExecuteShrinkEffect(float DeltaSeconds);
 
@@ -540,9 +535,6 @@ protected:
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetRunning(bool bNewRunning, bool bToggle);
-
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetScale(FVector Scale);
 
 	/** Builds list of points to check for pausing replication for a connection*/
 	void BuildPauseReplicationCheckPoints(TArray<FVector>& RelevancyCheckPoints);
