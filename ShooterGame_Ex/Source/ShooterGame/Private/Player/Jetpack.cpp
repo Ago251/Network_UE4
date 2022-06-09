@@ -63,7 +63,7 @@ void UJetpack::ConsumeJetpackFuel(float DeltaTime) {
 void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	float JetDir = CharacterMovement->GetGravityZ() * -1;
 
-	if (Fuel <= 0.0f) {
+	if (Fuel <= 0.0f || ShooterCharacterOwner->bIsFreezing) {
 		bUseJetpack = false;
 		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Falling);
 	}
