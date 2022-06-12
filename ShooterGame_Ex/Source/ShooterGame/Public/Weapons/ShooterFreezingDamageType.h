@@ -15,6 +15,6 @@ class SHOOTERGAME_API UShooterFreezingDamageType : public UShooterDamageType
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Freezing")
 	float FreezingTime;
 };

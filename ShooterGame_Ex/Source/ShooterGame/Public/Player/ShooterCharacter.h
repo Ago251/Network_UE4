@@ -423,23 +423,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  Category = Health)
 	uint32 bIsDying : 1;
 
-	/** Identifies if pawn is in its freezing state */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
-	uint32 bIsFreezing : 1;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = Malus)
-	uint32 bIsShrink : 1;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = Malus)
 	FVector OffsetValue;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	UShooterFreezingDamageType* FreezingEffect;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	UShooterShrinkDamageType* ShrinkEffect;
 
-	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Shrink")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Freezing")
 	float ElapsedFreezingTime;
 
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Shrink")

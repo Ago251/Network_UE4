@@ -274,17 +274,15 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	if (ShooterDamageType) {
 		switch (ShooterDamageType->Effect) {
 		case EEffect::Freezing:
-			if (!bIsFreezing) {
+			if (!FreezingEffect) {
 				FreezingEffect = Cast<UShooterFreezingDamageType>(ShooterDamageType);
 				ElapsedFreezingTime = 0;
-				bIsFreezing = true;
 			}
 			break;
 		case EEffect::Shrink:
-			if (!bIsShrink) {
+			if (!ShrinkEffect) {
 				ShrinkEffect = Cast<UShooterShrinkDamageType>(ShooterDamageType);
 				ElapsedShrinkTime = 0;
-				bIsShrink = true;
 			}
 			break;
 		case EEffect::StepOn:
@@ -312,7 +310,7 @@ float AShooterCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dam
 	}
 
 
-	if(ActualDamage > 0.0f)
+	if (ActualDamage > 0.0f)
 		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 
 	return ActualDamage;
@@ -360,7 +358,7 @@ bool AShooterCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent
 void AShooterCharacter::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) {
 	AShooterCharacter* character = Cast<AShooterCharacter>(Other);
 	if (character) {
-		if (character->bIsShrink) {
+		if (character->ShrinkEffect) {
 			FVector direction = HitLocation - GetActorLocation();
 			direction.Normalize();
 			if (direction.Z < -0.7) {
@@ -768,12 +766,12 @@ void AShooterCharacter::StopWeaponFire()
 
 bool AShooterCharacter::CanFire() const
 {
-	return IsAlive() && bIsFreezing == false;
+	return IsAlive() && !FreezingEffect;
 }
 
 bool AShooterCharacter::CanReload() const
 {
-	return bIsFreezing == false;
+	return !FreezingEffect;
 }
 
 void AShooterCharacter::SetTargeting(bool bNewTargeting)
@@ -952,7 +950,7 @@ void AShooterCharacter::FireTrigger(float Val)
 
 void AShooterCharacter::MoveForward(float Val)
 {
-	if (Controller && Val != 0.f && !bIsFreezing)
+	if (Controller && Val != 0.f && !FreezingEffect)
 	{
 		// Limit pitch when walking or falling
 		const bool bLimitRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
@@ -964,7 +962,7 @@ void AShooterCharacter::MoveForward(float Val)
 
 void AShooterCharacter::MoveRight(float Val)
 {
-	if (Val != 0.f && !bIsFreezing)
+	if (Val != 0.f && !FreezingEffect)
 	{
 		const FQuat Rotation = GetActorQuat();
 		const FVector Direction = FQuatRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
@@ -974,7 +972,7 @@ void AShooterCharacter::MoveRight(float Val)
 
 void AShooterCharacter::MoveUp(float Val)
 {
-	if (Val != 0.f && !bIsFreezing)
+	if (Val != 0.f && !FreezingEffect)
 	{
 		// Not when walking or falling.
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
@@ -988,28 +986,28 @@ void AShooterCharacter::MoveUp(float Val)
 
 void AShooterCharacter::TurnAtRate(float Val)
 {
-	if (!bIsFreezing)
+	if (!FreezingEffect)
 		// calculate delta for this frame from the rate information
 		AddControllerYawInput(Val * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AShooterCharacter::LookUpAtRate(float Val)
 {
-	if (!bIsFreezing)
+	if (!FreezingEffect)
 		// calculate delta for this frame from the rate information
 		AddControllerPitchInput(Val * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AShooterCharacter::AddControllerPitchInput(float Val)
 {
-	if (!bIsFreezing)
+	if (!FreezingEffect)
 		Super::AddControllerPitchInput(Val);
 }
 
 
 void AShooterCharacter::AddControllerYawInput(float Val)
 {
-	if (!bIsFreezing)
+	if (!FreezingEffect)
 		Super::AddControllerYawInput(Val);
 }
 
@@ -1017,7 +1015,7 @@ void AShooterCharacter::AddControllerYawInput(float Val)
 void AShooterCharacter::OnStartFire()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (IsRunning())
 		{
@@ -1035,7 +1033,7 @@ void AShooterCharacter::OnStopFire()
 void AShooterCharacter::OnStartTargeting()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (IsRunning())
 		{
@@ -1053,7 +1051,7 @@ void AShooterCharacter::OnStopTargeting()
 void AShooterCharacter::OnNextWeapon()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
@@ -1067,7 +1065,7 @@ void AShooterCharacter::OnNextWeapon()
 void AShooterCharacter::OnPrevWeapon()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
@@ -1081,7 +1079,7 @@ void AShooterCharacter::OnPrevWeapon()
 void AShooterCharacter::OnReload()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (CurrentWeapon)
 		{
@@ -1093,7 +1091,7 @@ void AShooterCharacter::OnReload()
 void AShooterCharacter::OnStartRunning()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (IsTargeting())
 		{
@@ -1107,7 +1105,7 @@ void AShooterCharacter::OnStartRunning()
 void AShooterCharacter::OnStartRunningToggle()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		if (IsTargeting())
 		{
@@ -1154,11 +1152,11 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
-	if (bIsFreezing) {
+	if (FreezingEffect) {
 		ExecuteFreezingEffect(DeltaSeconds);
 	}
 
-	if (bIsShrink) {
+	if (ShrinkEffect) {
 		ExecuteShrinkEffect(DeltaSeconds);
 	}
 
@@ -1194,9 +1192,9 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 	const bool bLocallyControlled = (PC ? PC->IsLocalController() : false);
 	const uint32 UniqueID = GetUniqueID();
 	FAudioThread::RunCommandOnAudioThread([UniqueID, bLocallyControlled]()
-		{
-			USoundNodeLocalPlayer::GetLocallyControlledActorCache().Add(UniqueID, bLocallyControlled);
-		});
+	{
+		USoundNodeLocalPlayer::GetLocallyControlledActorCache().Add(UniqueID, bLocallyControlled);
+	});
 
 	TArray<FVector> PointsToTest;
 	BuildPauseReplicationCheckPoints(PointsToTest);
@@ -1211,12 +1209,10 @@ void AShooterCharacter::Tick(float DeltaSeconds)
 }
 
 void AShooterCharacter::ExecuteFreezingEffect(float DeltaSeconds) {
-	if (FreezingEffect) {
-		ElapsedFreezingTime += DeltaSeconds;
-		if (ElapsedFreezingTime > FreezingEffect->FreezingTime) {
-			ElapsedFreezingTime = 0;
-			bIsFreezing = false;
-		}
+	ElapsedFreezingTime += DeltaSeconds;
+	if (ElapsedFreezingTime > FreezingEffect->FreezingTime) {
+		ElapsedFreezingTime = 0;
+		FreezingEffect = NULL;
 	}
 }
 
@@ -1225,7 +1221,8 @@ void AShooterCharacter::ExecuteShrinkEffect(float DeltaSeconds) {
 		ElapsedShrinkTime += DeltaSeconds;
 		if (ElapsedShrinkTime > ShrinkEffect->ShrinkTime) {
 			ElapsedShrinkTime = 0;
-			bIsShrink = false;
+			ShrinkEffect = NULL;
+			return;
 		}
 
 		if (ElapsedShrinkTime <= ShrinkEffect->ResizeTime) {
@@ -1250,7 +1247,7 @@ void AShooterCharacter::RecalculateBaseEyeHeight()
 	{
 		BaseEyeHeight = CrouchedEyeHeight;
 	}
-	else{
+	else {
 		BaseEyeHeight = StandUpEyeHeight;
 	}
 
@@ -1265,16 +1262,16 @@ void AShooterCharacter::BeginDestroy()
 	{
 		const uint32 UniqueID = GetUniqueID();
 		FAudioThread::RunCommandOnAudioThread([UniqueID]()
-			{
-				USoundNodeLocalPlayer::GetLocallyControlledActorCache().Remove(UniqueID);
-			});
+		{
+			USoundNodeLocalPlayer::GetLocallyControlledActorCache().Remove(UniqueID);
+		});
 	}
 }
 
 void AShooterCharacter::OnStartJump()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && !FreezingEffect)
 	{
 		bPressedJump = true;
 	}
@@ -1289,7 +1286,7 @@ void AShooterCharacter::OnStopJump()
 void AShooterCharacter::OnStartJetpack()
 {
 	AShooterPlayerController* MyPC = Cast<AShooterPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && Jetpack1P->CanUse() && !bIsFreezing)
+	if (MyPC && MyPC->IsGameInputAllowed() && Jetpack1P->CanUse() && !FreezingEffect)
 		Jetpack1P->SetJetpack(true);
 }
 
@@ -1328,8 +1325,6 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& 
 	DOREPLIFETIME(AShooterCharacter, FreezingEffect);
 	DOREPLIFETIME(AShooterCharacter, CurrentWeapon);
 	DOREPLIFETIME(AShooterCharacter, Health);
-	DOREPLIFETIME(AShooterCharacter, bIsFreezing);
-	DOREPLIFETIME(AShooterCharacter, bIsShrink);
 	DOREPLIFETIME(AShooterCharacter, ElapsedFreezingTime);
 	DOREPLIFETIME(AShooterCharacter, ElapsedShrinkTime);
 }
