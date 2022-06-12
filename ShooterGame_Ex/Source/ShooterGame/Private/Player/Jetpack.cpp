@@ -16,7 +16,7 @@ UJetpack::UJetpack()
 	FuelConsume = 10;
 	TimeFuelConsume = 0.1;
 	TimeRecover = 10;
-	MaxSpeed = 1000;
+	Speed = 1000;
 	// ...
 }
 
@@ -71,7 +71,7 @@ void UJetpack::PhysJetpack(float deltaTime, int32 Iterations) {
 	ElapsedTime += deltaTime * JetDir;
 	float CurveValue = JetpackCurve->GetFloatValue(ElapsedTime);
 
-	CharacterMovement->Velocity.Z = CurveValue * MaxSpeed * deltaTime;
+	CharacterMovement->Velocity.Z = CurveValue * Speed * deltaTime;
 
 	CharacterMovement->PhysFalling(deltaTime, Iterations);
 }
